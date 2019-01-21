@@ -1,0 +1,79 @@
+Identify online patient conversations
+__________________________________________________________
+
+Developer: M R Abhishek
+Language: Python
+__________________________________________________________
+
+Steps:
+1. Remove unnecessary columns from data frame.
+2. Preprocess text.
+3. Feature generation.
+4. Evaluation metric selection.
+5. Model Architecture:
+	1. Tf-Idf with Neural Network
+	2. Embeddings with LSTM
+6. Hyper parameter tuning.
+7. Ensemble model(92.99 on test data).
+__________________________________________________________
+
+Preprocess Data - Remove unnecessary columns:
+1. The dataset consists of different columns of information. But, the patient can be identified only through conversation text.
+2. The patient_tag doesn’t depend on source, time at which it is posted. At the end of the day, the output depends only on the patient’s conversation.
+3. All the columns except ‘TRANS_CONV_TEXT’, are removed from the dataframe.
+4. Now the task is to classify the conversation into Yes or No. Also, there is only one row with NaN. This row has been removed.
+5. Later, some extra features were added. That will be discussed later.
+__________________________________________________________
+
+Preprocess Text:
+1. Punctuations are removed.
+2. Lemmatization: This will convert a word into its root word. This process remove inflectional endings and return the base or dictionary form of the word. We may lose some information, but this technique will work in NLP tasks.
+3. Removal of stopwords: These words don’t contribute to the prediction.
+4. Hence, removal of stopwords doesn’t harm the performance of the model.
+__________________________________________________________
+
+Feature Generation:
+1. Approach 1: Top 1000 words are considered. The text conversation is converted into Tf-Idf vector which is used for training. Sklearn TfidfVectorizer
+is used to convert text into vector.
+2. Approach 2: Each word is converted into an unique integer and Embeddings are learned using Embedding layer. As the domain is different from normal
+conversations, this way of learning word-embeddings is task specific and performs well. Keras is used in this approach.
+__________________________________________________________
+
+Evaluation metric:
+1. The data is imbalanced. So, evaluating a model based on accuracy is not a good choice in this case.
+2. In this case, ROC AUC is a better metric to evaluate a model.
+__________________________________________________________
+
+Hyperparameter tuning:
+1. A lot of hyperparameter tuning has been done. Some of the parameters that were tuned are learning rate, optimizer, number of hidden layers, type of
+layer, number of neurons in hidden layers, dropout, number of iterations and activation function.
+2. 20% of train data is used as validation set. This is used while training, which helped the model work better.
+3. Also, the data is shuffled to make sure that there won’t be any bias while training.
+__________________________________________________________
+
+Extra features:
+1. Features added to the input vector:
+	1. The information of Source(YouTube, Facebook, Blogs,..etc) is added to the vector.
+	2. Length of the text.
+	3. Number of Nouns in the conversation text.
+	4. Length of the title.
+	5. The day is divided into four categories and this information is added to the vector.
+		■ 12 am - 6 am
+		■ 6 am - 12 pm
+		■ 12 pm - 6 pm
+		■ 6 pm - 12 am
+2. There was no improvement in the model after adding these features. So, the above features were removed.
+__________________________________________________________
+
+Results:
+1. Validation accuracy is ~ 87 - 90%. Validation AUC is ~ 97 - 98.5.
+2. The scores achieved on test set using variants of Approach 1 are 89.67 and 91.24. The score achieved using Approach 2 is 92.47.
+3. At the end, an Ensemble model is created using the predictions. Most occurring output from the above 3 files is considered as the final prediction. This gave a score of 92.99 on test data. This is the highest score achieved.
+__________________________________________________________
+
+Further Improvements:
+1. Dataset can be increased by using oversampling techniques or collecting more data.
+2. Feature generation step can be improved (if time permits).
+3. Try more different architectures.
+4. Ensembling different models instead of predictions.
+__________________________________________________________
